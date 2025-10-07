@@ -2,12 +2,21 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 
+type UnavailableEntry = {
+  bookingId: string;
+  startTime: string;
+  endTime: string;
+  customerName: string;
+  eventType: string;
+  status: string;
+};
+
 export async function GET(
   request: NextRequest,
-  { params }: { params: { hallOwnerId: string } }
+  context: { params: Promise<{ hallOwnerId: string }> }
 ) {
   try {
-    const { hallOwnerId } = params;
+    const { hallOwnerId } = await context.params;
     const { searchParams } = new URL(request.url);
     const resourceId = searchParams.get('resourceId');
     const startDate = searchParams.get('startDate');
@@ -77,7 +86,7 @@ export async function GET(
     console.log('Filtered to', filteredBookings.length, 'active bookings');
 
     // Group bookings by date and resource
-    const unavailableDates: Record<string, Record<string, any[]>> = {};
+    const unavailableDates: Record<string, Record<string, UnavailableEntry[]>> = {};
 
     filteredBookings.forEach((doc) => {
       const booking = doc.data();
@@ -114,13 +123,12 @@ export async function GET(
       totalBookings: filteredBookings.length,
       message: 'Successfully fetched unavailable dates',
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error fetching unavailable dates:', error);
-    console.error('Error stack:', error.stack);
+    const message = error instanceof Error ? error.message : 'Internal server error while fetching unavailable dates';
     return NextResponse.json(
       {
-        message: 'Internal server error while fetching unavailable dates',
-        error: error.message,
+        message,
       },
       { status: 500 }
     );

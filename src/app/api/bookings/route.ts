@@ -222,7 +222,16 @@ export async function POST(request: NextRequest) {
 
     // Calculate booking price
     let calculatedPrice = 0;
-    let priceDetails: any = null;
+    let priceDetails: {
+      rateType: string;
+      weekdayRate: number;
+      weekendRate: number;
+      appliedRate: number;
+      durationHours: number;
+      isWeekend: boolean;
+      calculationMethod: 'hourly' | 'daily';
+      frontendEstimatedPrice: number | null;
+    } | null = null;
 
     try {
       // Get pricing for the selected hall
@@ -279,7 +288,7 @@ export async function POST(request: NextRequest) {
         // Use frontend estimated price if no pricing is set
         calculatedPrice = estimatedPrice || 0;
       }
-    } catch (pricingError: any) {
+    } catch (pricingError: unknown) {
       console.error('Error calculating price:', pricingError);
       // Use frontend estimated price if calculation fails
       calculatedPrice = estimatedPrice || 0;
@@ -332,7 +341,7 @@ export async function POST(request: NextRequest) {
       });
 
       console.log('Notification created for hall owner');
-    } catch (notificationError: any) {
+    } catch (notificationError: unknown) {
       console.error('Error creating notification:', notificationError);
       // Don't fail the booking if notification creation fails
     }
@@ -372,7 +381,7 @@ export async function POST(request: NextRequest) {
       });
 
       console.log('Notification email sent to hall owner:', hallOwnerData.email);
-    } catch (emailError: any) {
+    } catch (emailError: unknown) {
       console.error('Error sending emails:', emailError);
       // Don't fail the booking if email sending fails
       // But log it for monitoring
@@ -384,12 +393,12 @@ export async function POST(request: NextRequest) {
       calculatedPrice: calculatedPrice,
       status: 'pending',
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error creating booking:', error);
     return NextResponse.json(
       {
         message: 'Internal server error',
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     );

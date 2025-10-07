@@ -2,12 +2,24 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 
+type ResourceItem = {
+  id: string;
+  name: string;
+  type: string;
+  capacity: number;
+  code: string;
+  description: string;
+  hallOwnerId: string;
+  createdAt: string | null;
+  updatedAt: string | null;
+};
+
 export async function GET(
   request: NextRequest,
-  { params }: { params: { hallOwnerId: string } }
+  context: { params: Promise<{ hallOwnerId: string }> }
 ) {
   try {
-    const { hallOwnerId } = params;
+    const { hallOwnerId } = await context.params;
 
     // Get hall owner data to verify they exist and get their information
     const userDocRef = doc(db, 'users', hallOwnerId);
@@ -35,7 +47,7 @@ export async function GET(
     );
     const resourcesSnapshot = await getDocs(resourcesQuery);
 
-    const resources = resourcesSnapshot.docs.map((doc) => {
+    const resources: ResourceItem[] = resourcesSnapshot.docs.map((doc) => {
       const data = doc.data();
       return {
         id: doc.id,
@@ -66,10 +78,10 @@ export async function GET(
       resources,
       hallOwner: hallOwnerInfo,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error fetching public resources:', error);
     return NextResponse.json(
-      { message: error.message || 'Internal server error' },
+      { message: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }
     );
   }

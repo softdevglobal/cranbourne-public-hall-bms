@@ -2,13 +2,28 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, doc, deleteDoc } from 'firebase/firestore';
 
+type BookingSummary = {
+  id: string;
+  customerName: string | null | undefined;
+  customerEmail: string | null | undefined;
+  eventType: string | null | undefined;
+  selectedHall: string | null | undefined;
+  hallName: string | null | undefined;
+  bookingDate: string | null | undefined;
+  startTime: string | null | undefined;
+  endTime: string | null | undefined;
+  status: string | null | undefined;
+  calculatedPrice: number | null | undefined;
+  createdAt: string | null;
+};
+
 // GET /api/bookings/debug/[hallOwnerId] - View all bookings for debugging
 export async function GET(
   request: NextRequest,
-  { params }: { params: { hallOwnerId: string } }
+  context: { params: Promise<{ hallOwnerId: string }> }
 ) {
   try {
-    const { hallOwnerId } = params;
+    const { hallOwnerId } = await context.params;
     const { searchParams } = new URL(request.url);
     const includeAll = searchParams.get('includeAll') === 'true';
 
@@ -20,7 +35,7 @@ export async function GET(
 
     const bookingsSnapshot = await getDocs(bookingsQuery);
 
-    const bookings = bookingsSnapshot.docs.map((doc) => {
+    const bookings: BookingSummary[] = bookingsSnapshot.docs.map((doc) => {
       const data = doc.data();
       return {
         id: doc.id,
@@ -41,10 +56,10 @@ export async function GET(
     // Filter active bookings if not including all
     const filteredBookings = includeAll
       ? bookings
-      : bookings.filter((b) => ['pending', 'confirmed'].includes(b.status));
+      : bookings.filter((b) => ['pending', 'confirmed'].includes((b.status || '').toString()));
 
     // Group by date and resource
-    const groupedByDate: Record<string, any[]> = {};
+    const groupedByDate: Record<string, BookingSummary[]> = {};
     filteredBookings.forEach((booking) => {
       const key = `${booking.bookingDate} - ${booking.hallName}`;
       if (!groupedByDate[key]) {
@@ -60,10 +75,10 @@ export async function GET(
       groupedByDate,
       hallOwnerId,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error fetching debug bookings:', error);
     return NextResponse.json(
-      { message: error.message || 'Internal server error' },
+      { message: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }
     );
   }
@@ -72,7 +87,7 @@ export async function GET(
 // DELETE /api/bookings/debug/[hallOwnerId]?bookingId=xxx - Delete a specific booking for debugging
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { hallOwnerId: string } }
+  _context: { params: Promise<{ hallOwnerId: string }> }
 ) {
   try {
     const { searchParams } = new URL(request.url);
@@ -92,10 +107,10 @@ export async function DELETE(
       message: 'Booking deleted successfully',
       bookingId,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error deleting booking:', error);
     return NextResponse.json(
-      { message: error.message || 'Internal server error' },
+      { message: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }
     );
   }
