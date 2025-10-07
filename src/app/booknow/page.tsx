@@ -300,7 +300,31 @@ export default function BookNow() {
         });
         setSelectedDates({});
       } else {
-        throw new Error(result.message || 'Failed to submit booking');
+        // Handle specific error cases
+        if (response.status === 409 && result.conflictingBooking) {
+          // Time slot conflict
+          const conflict = result.conflictingBooking;
+          const debugInfo = result.debug;
+          
+          let conflictMessage = `This time slot is already booked.\n\n`;
+          conflictMessage += `You requested: ${debugInfo?.requestedTime || `${formData.startTime} - ${formData.endTime}`}\n`;
+          conflictMessage += `Already booked: ${debugInfo?.bookedTime || `${conflict.startTime} - ${conflict.endTime}`}\n`;
+          if (conflict.customerName) {
+            conflictMessage += `Booking by: ${conflict.customerName}\n`;
+          }
+          conflictMessage += `\nPlease choose a different time slot.`;
+          
+          alert(conflictMessage);
+          
+          // Log to console for debugging
+          console.log('Booking conflict details:', {
+            conflict,
+            debug: debugInfo,
+            bookingId: conflict.bookingId,
+          });
+        } else {
+          throw new Error(result.message || 'Failed to submit booking');
+        }
       }
       
     } catch (error) {
