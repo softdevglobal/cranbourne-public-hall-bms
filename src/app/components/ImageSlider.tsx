@@ -46,13 +46,13 @@ const ImageSlider: React.FC = () => {
     return () => clearInterval(interval);
   }, [imagesPerSlide]);
 
-  const nextSlide = () => {
+  const nextSlide = React.useCallback(() => {
     setCurrent((prev) => (prev + imagesPerSlide) % images.length);
-  };
+  }, [imagesPerSlide]);
 
-  const prevSlide = () => {
+  const prevSlide = React.useCallback(() => {
     setCurrent((prev) => (prev - imagesPerSlide + images.length) % images.length);
-  };
+  }, [imagesPerSlide]);
 
   // Get visible images, wrapping around if needed
   const visibleImages = Array.from(
@@ -94,30 +94,48 @@ const ImageSlider: React.FC = () => {
     if (!container) return;
     let startX = 0;
     let tracking = false;
-    const onDown = (e: TouchEvent | MouseEvent) => {
+
+    const onTouchStart = (e: TouchEvent) => {
       tracking = true;
-      startX = 'touches' in e ? e.touches[0].clientX : (e as MouseEvent).clientX;
+      startX = e.touches[0].clientX;
     };
-    const onUp = (e: TouchEvent | MouseEvent) => {
+
+    const onTouchEnd = (e: TouchEvent) => {
       if (!tracking) return;
-      const endX = 'changedTouches' in e ? e.changedTouches[0].clientX : (e as MouseEvent).clientX;
+      const endX = e.changedTouches[0].clientX;
       const dx = endX - startX;
       if (Math.abs(dx) > 50) {
         if (dx < 0) nextSlide(); else prevSlide();
       }
       tracking = false;
     };
-    container.addEventListener('touchstart', onDown, { passive: true });
-    container.addEventListener('touchend', onUp, { passive: true });
-    container.addEventListener('mousedown', onDown);
-    container.addEventListener('mouseup', onUp);
-    return () => {
-      container.removeEventListener('touchstart', onDown as any);
-      container.removeEventListener('touchend', onUp as any);
-      container.removeEventListener('mousedown', onDown as any);
-      container.removeEventListener('mouseup', onUp as any);
+
+    const onMouseDown = (e: MouseEvent) => {
+      tracking = true;
+      startX = e.clientX;
     };
-  }, [imagesPerSlide]);
+
+    const onMouseUp = (e: MouseEvent) => {
+      if (!tracking) return;
+      const endX = e.clientX;
+      const dx = endX - startX;
+      if (Math.abs(dx) > 50) {
+        if (dx < 0) nextSlide(); else prevSlide();
+      }
+      tracking = false;
+    };
+
+    container.addEventListener('touchstart', onTouchStart, { passive: true });
+    container.addEventListener('touchend', onTouchEnd, { passive: true });
+    container.addEventListener('mousedown', onMouseDown);
+    container.addEventListener('mouseup', onMouseUp);
+    return () => {
+      container.removeEventListener('touchstart', onTouchStart);
+      container.removeEventListener('touchend', onTouchEnd);
+      container.removeEventListener('mousedown', onMouseDown);
+      container.removeEventListener('mouseup', onMouseUp);
+    };
+  }, [imagesPerSlide, nextSlide, prevSlide]);
 
   // Reveal on scroll
   React.useEffect(() => {
@@ -176,7 +194,7 @@ const ImageSlider: React.FC = () => {
             {visibleImages.map((src, idx) => (
               <div
                 key={idx}
-                ref={(el) => (cardRefs.current[idx] = el)}
+                ref={(el) => { cardRefs.current[idx] = el; }}
                 className="gallery-card group relative rounded-2xl overflow-hidden aspect-[4/3] bg-white cursor-pointer shadow-sm hover:shadow-xl transition-shadow duration-300"
                 onClick={() => handleImageClick(src)}
                 onMouseMove={(e) => handleCardMouseMove(e, idx)}
