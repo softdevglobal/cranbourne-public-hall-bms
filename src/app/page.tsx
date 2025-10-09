@@ -21,27 +21,87 @@ export default function Home() {
       window.location.href = '/booknow';
     }
   };
+
+  
   return (
     <div className="bg-stone-50 font-sans min-h-screen flex flex-col">
 
   {/* Main Content */}
-  <main className="flex-1 pt-24 px-4 sm:px-8 md:px-12 lg:px-20 flex flex-col items-center bg-[#fdfaf6]">
-        <div className="w-full max-w-[1200px]">
-          {/* Hero Section */}
-          <section id="hero" className="flex min-h-[320px] sm:min-h-[420px] md:min-h-[520px] flex-col gap-6 sm:gap-8 bg-cover bg-center bg-no-repeat rounded-2xl items-center justify-center p-4 sm:p-8 mb-8" style={{backgroundImage: `linear-gradient(rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 100%), url(${Hero.src})`}}>
-            <div className="flex flex-col gap-2 sm:gap-4 text-center">
-              <h1 className="text-white text-3xl sm:text-5xl md:text-6xl font-black leading-tight tracking-[-0.033em]">Cranbourne Public Hall</h1>
-              <h2 className="text-white text-base sm:text-lg md:text-xl font-normal leading-normal max-w-2xl mx-auto">
-                From private celebrations to community parties, social groups to business meetings.
-              </h2>
-            </div>
-            <button 
+  <main className="flex-1 pt-0 flex flex-col items-center bg-[#fdfaf6]">
+        {/* Full-bleed Hero */}
+        <section id="hero" className="relative w-full overflow-hidden" aria-label="Cranbourne Public Hall Hero">
+          <div
+            className="absolute inset-0 bg-center bg-cover will-change-transform"
+            style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.65) 100%), url(${Hero.src})` }}
+          ></div>
+          <div className="absolute inset-0 scale-110 animate-kenburns bg-center bg-cover" style={{ backgroundImage: `url(${Hero.src})`, opacity: 0.15 }}></div>
+
+          <div className="relative z-10 mx-auto w-full px-4 sm:px-8 md:px-12 lg:px-20 flex flex-col items-center justify-center text-center min-h-[70vh] sm:min-h-[80vh] md:min-h-[90vh] py-16">
+            <h1 className="hero-words text-white text-4xl sm:text-5xl md:text-6xl font-black leading-tight tracking-[-0.033em]">
+              <span className="word w1">Cranbourne</span>
+              <span className="word w2">Public</span>
+              <span className="word w3">Hall</span>
+            </h1>
+            <div className="hero-divider"></div>
+            <p className="tagline text-white/90 text-[11px] sm:text-sm md:text-base font-normal leading-snug mt-2 sm:mt-3 animate-fadeUp delay-100 sm:whitespace-nowrap max-w-[92vw]">
+              A welcoming space for celebrations, community events, workshops and business meetings.
+            </p>
+            <button
               onClick={handleBookNowClick}
-              className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 sm:h-14 px-6 sm:px-8 bg-[#e63946] text-white text-base sm:text-lg font-bold leading-normal tracking-[0.015em] hover:bg-[#d62839] transition-colors mt-2 sm:mt-4"
+              className="cta-btn mt-6 sm:mt-8 inline-flex items-center justify-center h-12 sm:h-14 px-8 sm:px-10 rounded-full text-white text-base sm:text-lg font-bold tracking-[0.02em] animate-fadeUp delay-200"
             >
-              <span className="truncate">Book Now</span>
+              <span className="label">Book Now</span>
+              <span className="arrow ml-3" aria-hidden>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </span>
             </button>
-          </section>
+          </div>
+
+          {/* Wave separator */}
+          <svg className="absolute bottom-[-1px] left-0 w-full h-[40px] sm:h-[60px] text-[#fdfaf6]" viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-hidden="true">
+            <path d="M0,64 C240,160 480,0 720,64 C960,128 1200,32 1440,80 L1440,120 L0,120 Z" />
+          </svg>
+
+          <div className="absolute left-1/2 -translate-x-1/2 bottom-4 sm:bottom-6 z-10 opacity-70 animate-bounce text-white">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 5v14m0 0l-5-5m5 5l5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+
+          <style>{`
+            @keyframes kenburns { from { transform: scale(1.1); } to { transform: scale(1.2); } }
+            .animate-kenburns { animation: kenburns 18s ease-in-out infinite alternate; }
+            @keyframes fadeUp { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+            .animate-fadeUp { animation: fadeUp .6s ease-out both; }
+            .delay-100 { animation-delay: .1s; }
+            .delay-200 { animation-delay: .2s; }
+            .hero-words { position: relative; text-shadow: 0 2px 12px rgba(0,0,0,.35); }
+            .hero-words .word { display: inline-block; margin: 0 .25ch; color: transparent; background: linear-gradient(115deg, rgba(255,255,255,.5) 0%, #ffffff 25%, rgba(255,255,255,.5) 50%); -webkit-background-clip: text; background-clip: text; background-size: 200% 100%; animation: spotlight 6s linear infinite; }
+            .hero-words .w1 { animation-delay: 0s; }
+            .hero-words .w2 { animation-delay: .6s; }
+            .hero-words .w3 { animation-delay: 1.2s; }
+            @keyframes spotlight { 0% { background-position: -50% 0; transform: translateY(0) scale(1); } 10% { transform: translateY(-2px) scale(1.04); } 50% { background-position: 150% 0; } 100% { background-position: 250% 0; transform: translateY(0) scale(1); } }
+            .hero-divider { width: min(72%, 560px); height: 3px; margin: clamp(6px, 1.2vw, 14px) auto; background: linear-gradient(90deg, transparent, #e63946 25%, #ec8013 75%, transparent); border-radius: 9999px; opacity: .95; }
+            /* Clean premium CTA with shine sweep */
+            .cta-btn { position: relative; overflow: hidden; background: linear-gradient(180deg, #e63946, #d62839); box-shadow: 0 12px 28px rgba(230,57,70,.28); transition: transform .18s ease, box-shadow .18s ease; }
+            .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 18px 40px rgba(230,57,70,.36); }
+            .cta-btn:active { transform: translateY(0); }
+            .cta-btn .arrow svg { transition: transform .18s ease; }
+            .cta-btn:hover .arrow svg { transform: translateX(4px); }
+            .cta-btn::before { content: ""; position: absolute; inset: -10%; background: linear-gradient(90deg, rgba(255,255,255,.45), rgba(255,255,255,0) 40%, rgba(255,255,255,.45)); transform: translateX(-120%) skewX(-20deg); }
+            .cta-btn:hover::before { animation: ctaShine .9s ease forwards; }
+            @keyframes ctaShine { to { transform: translateX(120%) skewX(-20deg); } }
+            .cta-btn::after { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; background: linear-gradient(180deg, rgba(255,255,255,.35), rgba(255,255,255,.08)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; opacity: .55; }
+            /* Tagline responsive: clamp to two lines on small screens */
+            @media (max-width: 640px) {
+              .tagline { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+            }
+          `}</style>
+        </section>
+
+        <div className="w-full max-w-[1200px] px-4 sm:px-8 md:px-12 lg:px-20">
 
             {/* Image Slider Section */}
             <section id="gallery" className="mb-8">
