@@ -59,10 +59,7 @@ export default function Home() {
             </button>
           </div>
 
-          {/* Wave separator */}
-          <svg className="absolute bottom-[-1px] left-0 w-full h-[40px] sm:h-[60px] text-[#fdfaf6]" viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-hidden="true">
-            <path d="M0,64 C240,160 480,0 720,64 C960,128 1200,32 1440,80 L1440,120 L0,120 Z" />
-          </svg>
+
 
           <div className="absolute left-1/2 -translate-x-1/2 bottom-4 sm:bottom-6 z-10 opacity-70 animate-bounce text-white">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -101,13 +98,12 @@ export default function Home() {
           `}</style>
         </section>
 
-        <div className="w-full max-w-[1200px] px-4 sm:px-8 md:px-12 lg:px-20">
+        {/* Image Slider Section - Full Bleed */}
+        <section id="gallery" className="w-full">
+          <ImageSlider />
+        </section>
 
-            {/* Image Slider Section */}
-            <section id="gallery" className="mb-8">
-              <h2 className="text-[#181411] text-2xl sm:text-3xl font-bold leading-tight tracking-[-0.015em] px-2 sm:px-4 pb-4 sm:pb-6 pt-6 sm:pt-8 text-center">Gallery</h2>
-              <ImageSlider  />
-            </section>
+        <div className="w-full max-w-[1200px] px-4 sm:px-8 md:px-12 lg:px-20">
 
           {/* Facilities Section */}
           <section id="facilities" className="mb-8">

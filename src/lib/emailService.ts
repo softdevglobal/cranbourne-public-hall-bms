@@ -16,6 +16,7 @@ class EmailService {
 
   async sendBookingNotificationToHallOwner(bookingData: {
     bookingId: string;
+    bookingCode?: string;
     customerName: string;
     customerEmail: string;
     customerPhone: string;
@@ -65,6 +66,7 @@ class EmailService {
 
   async sendBookingConfirmationToCustomer(bookingData: {
     bookingId: string;
+    bookingCode?: string;
     customerName: string;
     customerEmail: string;
     eventType: string;
@@ -110,6 +112,7 @@ class EmailService {
 
   private generateHallOwnerEmailHTML(bookingData: {
     bookingId: string;
+    bookingCode?: string;
     customerName: string;
     customerEmail: string;
     customerPhone: string;
@@ -123,6 +126,7 @@ class EmailService {
   }) {
     const {
       bookingId,
+      bookingCode,
       customerName,
       customerEmail,
       customerPhone,
@@ -179,6 +183,12 @@ class EmailService {
                   <td style="padding: 8px 0; color: #64748b; font-weight: bold;">Booking ID:</td>
                   <td style="padding: 8px 0; color: #1e293b;">${bookingId}</td>
                 </tr>
+                ${bookingCode ? `
+                <tr>
+                  <td style="padding: 8px 0; color: #64748b; font-weight: bold;">Booking Code:</td>
+                  <td style="padding: 8px 0; color: #1e293b;">${bookingCode}</td>
+                </tr>
+                ` : ''}
                 <tr>
                   <td style="padding: 8px 0; color: #64748b; font-weight: bold;">Event Type:</td>
                   <td style="padding: 8px 0; color: #1e293b;">${eventType}</td>
@@ -233,6 +243,7 @@ class EmailService {
 
   private generateCustomerEmailHTML(bookingData: {
     bookingId: string;
+    bookingCode?: string;
     customerName: string;
     eventType: string;
     hallName: string;
@@ -244,6 +255,7 @@ class EmailService {
   }) {
     const {
       bookingId,
+      bookingCode,
       customerName,
       eventType,
       hallName,
@@ -289,6 +301,12 @@ class EmailService {
                   <td style="padding: 8px 0; color: #64748b; font-weight: bold;">Booking Reference:</td>
                   <td style="padding: 8px 0; color: #1e293b;">${bookingId}</td>
                 </tr>
+                ${bookingCode ? `
+                <tr>
+                  <td style="padding: 8px 0; color: #64748b; font-weight: bold;">Booking Code:</td>
+                  <td style="padding: 8px 0; color: #1e293b;">${bookingCode}</td>
+                </tr>
+                ` : ''}
                 <tr>
                   <td style="padding: 8px 0; color: #64748b; font-weight: bold;">Event Type:</td>
                   <td style="padding: 8px 0; color: #1e293b;">${eventType}</td>

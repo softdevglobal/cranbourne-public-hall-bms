@@ -10,24 +10,7 @@ import img5 from "@/assets/gallary/gallery5.jpg";
 
 const images: StaticImageData[] = [img1, img2, img3, img4, img5];
 
-const useImagesPerSlide = () => {
-  const [imagesPerSlide, setImagesPerSlide] = React.useState(2);
-
-  React.useEffect(() => {
-    const update = () => {
-      if (window.innerWidth < 640) {
-        setImagesPerSlide(1);
-      } else {
-        setImagesPerSlide(2);
-      }
-    };
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, []);
-
-  return imagesPerSlide;
-};
+const useImagesPerSlide = () => 1; // Full-width: always 1 image per slide
 
 const ImageSlider: React.FC = () => {
   const [current, setCurrent] = React.useState(0);
@@ -54,20 +37,7 @@ const ImageSlider: React.FC = () => {
     setCurrent((prev) => (prev - imagesPerSlide + images.length) % images.length);
   }, [imagesPerSlide]);
 
-  // Get visible images, wrapping around if needed
-  const visibleImages = Array.from(
-    { length: imagesPerSlide },
-    (_, i) => images[(current + i) % images.length]
-  );
-
-  // Responsive image size
-  const getImageSize = () => {
-    if (typeof window !== "undefined" && window.innerWidth < 640) {
-      return { width: 480, height: 360 }; // Mobile – larger
-    }
-    return { width: 720, height: 480 }; // Desktop – two large cards
-  };
-  const { width, height } = getImageSize();
+  const currentImage = images[current % images.length];
 
   const handleImageClick = (img: StaticImageData) => {
     setModalImg(img);
@@ -137,19 +107,7 @@ const ImageSlider: React.FC = () => {
     };
   }, [imagesPerSlide, nextSlide, prevSlide]);
 
-  // Reveal on scroll
-  React.useEffect(() => {
-    const cards = cardRefs.current.filter(Boolean) as HTMLDivElement[];
-    if (cards.length === 0) return;
-    const obs = new IntersectionObserver(
-      (entries) => entries.forEach((en) => {
-        if (en.isIntersecting) en.target.classList.add('reveal');
-      }),
-      { threshold: 0.2 }
-    );
-    cards.forEach((c) => obs.observe(c));
-    return () => obs.disconnect();
-  }, [current, imagesPerSlide]);
+  // No reveal animation for full-width hero-style gallery
 
   const handleCardMouseMove = (e: React.MouseEvent<HTMLDivElement>, idx: number) => {
     const card = cardRefs.current[idx];
@@ -168,76 +126,45 @@ const ImageSlider: React.FC = () => {
 
   return (
     <>
-      <div className="w-full flex flex-col items-center py-8">
-        <div ref={containerRef} className="flex items-center justify-center gap-4 w-full">
+      <div className="relative w-full">
+        <div ref={containerRef} className="relative w-full h-[55vh] sm:h-[65vh] md:h-[75vh] bg-black overflow-hidden">
+          <Image
+            src={currentImage}
+            alt={`Gallery ${current % images.length}`}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover w-full h-full"
+            onClick={() => handleImageClick(currentImage)}
+          />
+
+          {/* Prev */}
           <button
             onClick={prevSlide}
-            className="rounded-full bg-gray-200 hover:bg-gray-300 p-1.5 sm:p-2 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center"
+            className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-black/40 hover:bg-black/60 p-2 sm:p-3 text-white"
+            aria-label="Previous image"
           >
-            <svg
-              className="w-4 h-4 sm:w-6 sm:h-6"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              <path d="M15 19l-7-7 7-7" />
-            </svg>
+            <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
           </button>
 
-          {/* Grid layout - tailwind doesn't support dynamic cols directly */}
-          <div
-            className={`grid gap-4 w-full ${
-              imagesPerSlide === 1 ? "grid-cols-1" : "sm:grid-cols-2"
-            }`}
-          >
-            {visibleImages.map((src, idx) => (
-              <div
-                key={idx}
-                ref={(el) => { cardRefs.current[idx] = el; }}
-                className="gallery-card group relative rounded-2xl overflow-hidden aspect-[4/3] bg-white cursor-pointer shadow-sm hover:shadow-xl transition-shadow duration-300"
-                onClick={() => handleImageClick(src)}
-                onMouseMove={(e) => handleCardMouseMove(e, idx)}
-                onMouseLeave={() => handleCardMouseLeave(idx)}
-              >
-                <Image
-                  src={src}
-                  alt={`Gallery ${(current + idx) % images.length}`}
-                  width={width}
-                  height={height}
-                  className="object-cover w-full h-full scale-100 group-hover:scale-[1.03] transition-transform duration-500"
-                />
-                <span className="shine" aria-hidden></span>
-              </div>
-            ))}
-          </div>
-
+          {/* Next */}
           <button
             onClick={nextSlide}
-            className="rounded-full bg-gray-200 hover:bg-gray-300 p-1.5 sm:p-2 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center"
+            className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-black/40 hover:bg-black/60 p-2 sm:p-3 text-white"
+            aria-label="Next image"
           >
-            <svg
-              className="w-4 h-4 sm:w-6 sm:h-6"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              <path d="M9 5l7 7-7 7" />
-            </svg>
+            <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
           </button>
-        </div>
 
-        {/* Dots */}
-        <div className="flex gap-2 mt-4">
-          {images.map((_, i) => (
-            <span
-              key={i}
-              className={`w-2.5 h-2.5 rounded-full ${
-                i === current ? "bg-orange-500" : "bg-gray-300"
-              } transition-colors duration-300`}
-            ></span>
-          ))}
+          {/* Dots */}
+          <div className="absolute inset-x-0 bottom-4 flex items-center justify-center gap-2">
+            {images.map((_, i) => (
+              <span
+                key={i}
+                className={`w-2.5 h-2.5 rounded-full ${i === current ? "bg-white" : "bg-white/40"}`}
+              ></span>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -281,13 +208,7 @@ const ImageSlider: React.FC = () => {
         </div>
       )}
 
-      <style>{`
-        .gallery-card { transform-style: preserve-3d; transition: transform .15s ease-out; }
-        .gallery-card .shine { position: absolute; inset: 0; background: radial-gradient(circle at 30% 20%, rgba(255,255,255,.35), transparent 40%); mix-blend-mode: screen; opacity: 0; transition: opacity .3s ease; }
-        .gallery-card:hover .shine { opacity: .7; }
-        .gallery-card.reveal { animation: galleryFadeUp .5s ease-out both; }
-        @keyframes galleryFadeUp { from { transform: translateY(10px); opacity: .001; } to { transform: translateY(0); opacity: 1; } }
-      `}</style>
+      {/* No extra styles needed for full-bleed layout */}
     </>
   );
 };

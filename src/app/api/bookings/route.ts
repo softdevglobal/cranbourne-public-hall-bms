@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, query, where, getDocs, doc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, query, where, getDocs, doc, getDoc, serverTimestamp, runTransaction } from 'firebase/firestore';
 import { emailService } from '@/lib/emailService';
 
 export async function POST(request: NextRequest) {
@@ -294,6 +294,31 @@ export async function POST(request: NextRequest) {
       calculatedPrice = estimatedPrice || 0;
     }
 
+    // Generate a human-readable unique booking code with collision check: BK-YYYYMMDD-ABCDE
+    const ymd = bookingDate.replace(/-/g, '');
+    const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    function randomSuffix(len = 5) {
+      let s = '';
+      for (let i = 0; i < len; i++) s += alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+      return s;
+    }
+    async function createUniqueBookingCode(): Promise<string> {
+      const maxAttempts = 12;
+      for (let i = 0; i < maxAttempts; i++) {
+        const candidate = `BK-${ymd}-${randomSuffix(5)}`;
+        const checkQ = query(collection(db, 'bookings'), where('bookingCode', '==', candidate));
+        const check = await getDocs(checkQ);
+        if (check.empty) return candidate;
+      }
+      throw new Error('Could not allocate a unique booking code');
+    }
+    let bookingCode: string | null = null;
+    try {
+      bookingCode = await createUniqueBookingCode();
+    } catch (err) {
+      console.warn('bookingCode generation failed (non-blocking):', (err as Error)?.message || err);
+    }
+
     // Create booking data
     const bookingData = {
       customerId: customerId || null,
@@ -316,6 +341,7 @@ export async function POST(request: NextRequest) {
       bookingSource: bookingSource,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
+      ...(bookingCode ? { bookingCode } : {}),
     };
 
     // Save to Firestore
@@ -332,6 +358,7 @@ export async function POST(request: NextRequest) {
         message: `New booking request from ${customerName} for ${bookingDate}`,
         data: {
           bookingId: docRef.id,
+          ...(bookingCode ? { bookingCode } : {}),
           customerName: customerName,
           bookingDate: bookingDate,
           hallName: hallData.name,
@@ -351,6 +378,7 @@ export async function POST(request: NextRequest) {
       // Send confirmation email to customer
       await emailService.sendBookingConfirmationToCustomer({
         bookingId: docRef.id,
+        ...(bookingCode ? { bookingCode } : {}),
         customerName: customerName,
         customerEmail: customerEmail,
         eventType: eventType,
@@ -367,6 +395,7 @@ export async function POST(request: NextRequest) {
       // Send notification email to hall owner
       await emailService.sendBookingNotificationToHallOwner({
         bookingId: docRef.id,
+        ...(bookingCode ? { bookingCode } : {}),
         customerName: customerName,
         customerEmail: customerEmail,
         customerPhone: cleanedPhone,
