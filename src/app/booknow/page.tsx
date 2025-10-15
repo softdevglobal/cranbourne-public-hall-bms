@@ -263,7 +263,7 @@ export default function BookNow() {
         // Additional customer info for better tracking
         customerAvatar: user?.avatar,
         guestCount: formData.guests,
-        bookingSource: 'cranbourne-website'
+        bookingSource: 'website'
       };  
       
       console.log("Submitting booking:", bookingData);
@@ -280,11 +280,13 @@ export default function BookNow() {
       
       if (response.ok) {
         const priceMessage = estimatedPrice ? ` Estimated cost: $${estimatedPrice.toFixed(2)}.` : '';
-        
+        const bookingCode = result.bookingCode ? `\nYour booking code: ${result.bookingCode}` : '';
+        const sourceInfo = result.bookingSource ? `\nSource: ${result.bookingSource}` : '';
+
         // Note: Notification is automatically created by the backend
         // No need to create it here to avoid duplicates
-        
-        alert(`Thank you for your booking request!${priceMessage} We'll get back to you soon with confirmation.`);
+
+        alert(`Thank you for your booking request!${priceMessage}${bookingCode}${sourceInfo} We'll get back to you soon with confirmation.`);
         // Reset form
         setFormData({
           name: "",

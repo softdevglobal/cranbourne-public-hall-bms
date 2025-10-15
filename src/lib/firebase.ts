@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, initializeFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 // Using the same Firebase project as BMS Pro
@@ -13,7 +13,8 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
+// Enable long polling to avoid gRPC idle stream disconnect noise in some environments
+export const db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
 export const auth = getAuth(app);
 
 export default app;

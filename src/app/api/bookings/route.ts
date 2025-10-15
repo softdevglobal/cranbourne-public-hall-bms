@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, query, where, getDocs, doc, getDoc, serverTimestamp, runTransaction } from 'firebase/firestore';
+import { collection, addDoc, query, where, getDocs, doc, getDoc, serverTimestamp, runTransaction, updateDoc, setDoc } from 'firebase/firestore';
 import { emailService } from '@/lib/emailService';
 
 export async function POST(request: NextRequest) {
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
       estimatedPrice,
       customerAvatar,
       guestCount,
-      bookingSource = 'cranbourne-website',
+      bookingSource = 'website',
     } = body;
 
     console.log('Creating booking with data:', {
@@ -319,6 +319,14 @@ export async function POST(request: NextRequest) {
       console.warn('bookingCode generation failed (non-blocking):', (err as Error)?.message || err);
     }
 
+    // Pre-create the document ID to ensure we can set a fallback code on initial write
+    const preCreatedRef = doc(collection(db, 'bookings'));
+    if (!bookingCode) {
+      const fallback = `BK-${ymd}-${preCreatedRef.id.slice(-6).toUpperCase()}`;
+      bookingCode = fallback;
+      console.log('Using precomputed fallback bookingCode:', fallback);
+    }
+
     // Create booking data
     const bookingData = {
       customerId: customerId || null,
@@ -338,14 +346,15 @@ export async function POST(request: NextRequest) {
       calculatedPrice: calculatedPrice,
       priceDetails: priceDetails,
       status: 'pending',
-      bookingSource: bookingSource,
+      bookingSource: bookingSource || 'website',
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       ...(bookingCode ? { bookingCode } : {}),
     };
 
-    // Save to Firestore
-    const docRef = await addDoc(collection(db, 'bookings'), bookingData);
+    // Save to Firestore (single write including bookingCode)
+    await setDoc(preCreatedRef, bookingData);
+    const docRef = preCreatedRef;
 
     console.log('Booking created successfully:', docRef.id);
 
@@ -419,6 +428,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       message: 'Booking created successfully',
       bookingId: docRef.id,
+      bookingCode: bookingCode,
+      bookingSource: bookingSource || 'website',
       calculatedPrice: calculatedPrice,
       status: 'pending',
     });
