@@ -294,46 +294,49 @@ class EmailService {
               Our team will review your request and get back to you within 24 hours.
             </div>
             
-            <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
-              <h3 style="color: #1e293b; margin: 0 0 15px 0;">Your Booking Details</h3>
+            <div style="background-color: #f0f9ff; border: 2px solid #0ea5e9; border-radius: 12px; padding: 25px; margin: 25px 0;">
+              <h3 style="color: #0c4a6e; margin: 0 0 20px 0; font-size: 20px; border-bottom: 2px solid #0ea5e9; padding-bottom: 10px;">
+                📋 Your Booking Details
+              </h3>
               <table style="width: 100%; border-collapse: collapse;">
-                <tr>
-                  <td style="padding: 8px 0; color: #64748b; font-weight: bold;">Booking Reference:</td>
-                  <td style="padding: 8px 0; color: #1e293b;">${bookingId}</td>
-                </tr>
                 ${bookingCode ? `
-                <tr>
-                  <td style="padding: 8px 0; color: #64748b; font-weight: bold;">Booking Code:</td>
-                  <td style="padding: 8px 0; color: #1e293b;">${bookingCode}</td>
+                <tr style="background-color: #fef3c7; border: 2px solid #f59e0b;">
+                  <td style="padding: 15px 12px; color: #92400e; font-weight: bold; font-size: 18px;">🎫 Booking Reference:</td>
+                  <td style="padding: 15px 12px; color: #92400e; font-weight: bold; font-size: 18px; font-family: monospace; text-align: right;">${bookingCode}</td>
                 </tr>
                 ` : ''}
                 <tr>
-                  <td style="padding: 8px 0; color: #64748b; font-weight: bold;">Event Type:</td>
-                  <td style="padding: 8px 0; color: #1e293b;">${eventType}</td>
+                  <td style="padding: 12px 8px; color: #64748b; font-weight: bold; border-bottom: 1px solid #e2e8f0;">Event Type:</td>
+                  <td style="padding: 12px 8px; color: #1e293b; border-bottom: 1px solid #e2e8f0; text-align: right;">${eventType}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 8px 0; color: #64748b; font-weight: bold;">Venue:</td>
-                  <td style="padding: 8px 0; color: #1e293b;">${hallName}</td>
+                  <td style="padding: 12px 8px; color: #64748b; font-weight: bold; border-bottom: 1px solid #e2e8f0;">Venue:</td>
+                  <td style="padding: 12px 8px; color: #1e293b; border-bottom: 1px solid #e2e8f0; text-align: right;">${hallName}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 8px 0; color: #64748b; font-weight: bold;">Date:</td>
-                  <td style="padding: 8px 0; color: #1e293b;">${bookingDate}</td>
+                  <td style="padding: 12px 8px; color: #64748b; font-weight: bold; border-bottom: 1px solid #e2e8f0;">Date:</td>
+                  <td style="padding: 12px 8px; color: #1e293b; border-bottom: 1px solid #e2e8f0; text-align: right;">${bookingDate}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 8px 0; color: #64748b; font-weight: bold;">Time:</td>
-                  <td style="padding: 8px 0; color: #1e293b;">${startTime} - ${endTime}</td>
+                  <td style="padding: 12px 8px; color: #64748b; font-weight: bold; border-bottom: 1px solid #e2e8f0;">Time:</td>
+                  <td style="padding: 12px 8px; color: #1e293b; border-bottom: 1px solid #e2e8f0; text-align: right;">${startTime} - ${endTime}</td>
                 </tr>
                 ${guestCount ? `
                 <tr>
-                  <td style="padding: 8px 0; color: #64748b; font-weight: bold;">Guest Count:</td>
-                  <td style="padding: 8px 0; color: #1e293b;">${guestCount} guests</td>
+                  <td style="padding: 12px 8px; color: #64748b; font-weight: bold; border-bottom: 1px solid #e2e8f0;">Guest Count:</td>
+                  <td style="padding: 12px 8px; color: #1e293b; border-bottom: 1px solid #e2e8f0; text-align: right;">${guestCount} guests</td>
                 </tr>
                 ` : ''}
-                <tr>
-                  <td style="padding: 8px 0; color: #64748b; font-weight: bold;">Estimated Price:</td>
-                  <td style="padding: 8px 0; color: #059669; font-weight: bold; font-size: 18px;">$${calculatedPrice.toFixed(2)}</td>
+                <tr style="background-color: #dcfce7; border-top: 2px solid #22c55e;">
+                  <td style="padding: 15px 12px; color: #166534; font-weight: bold; font-size: 18px;">💰 Estimated Price:</td>
+                  <td style="padding: 15px 12px; color: #166534; font-weight: bold; font-size: 18px; text-align: right;">$${calculatedPrice.toFixed(2)}</td>
                 </tr>
               </table>
+              <div style="margin-top: 15px; padding: 12px; background-color: #fef3c7; border-radius: 8px; border-left: 4px solid #f59e0b;">
+                <p style="margin: 0; color: #92400e; font-size: 14px; line-height: 1.6;">
+                  ℹ️ This is an estimated price. Final invoice will be sent once the booking is confirmed.
+                </p>
+              </div>
             </div>
             
             <div style="background-color: #dcfce7; border: 1px solid #22c55e; border-radius: 8px; padding: 20px; margin: 20px 0;">
