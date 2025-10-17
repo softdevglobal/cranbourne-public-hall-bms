@@ -278,6 +278,7 @@ class EmailService {
         <div style="max-width: 600px; margin: 0 auto; background-color: white; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
           <!-- Header -->
           <div style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); padding: 40px 20px; text-align: center;">
+            <img src="https://via.placeholder.com/200x80/4F46E5/FFFFFF?text=CPH" alt="Cranbourne Public Hall" draggable="false" style="max-width: 120px; height: auto; -webkit-user-drag: none; user-select: none; pointer-events: none; display: block; margin: 0 auto 12px;">
             <h1 style="color: white; margin: 0; font-size: 24px; font-weight: 600;">Cranbourne Public Hall</h1>
           </div>
           
