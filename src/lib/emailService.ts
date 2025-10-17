@@ -213,7 +213,7 @@ class EmailService {
                 ` : ''}
                 <tr>
                   <td style="padding: 8px 0; color: #64748b; font-weight: bold;">Estimated Price:</td>
-                  <td style="padding: 8px 0; color: #059669; font-weight: bold; font-size: 18px;">$${calculatedPrice.toFixed(2)}</td>
+                  <td style="padding: 8px 0; color: #059669; font-weight: bold; font-size: 18px;">$${calculatedPrice.toFixed(2)} <span style="font-size: 12px; font-weight: 500; color: #64748b;">+ taxes</span></td>
                 </tr>
               </table>
             </div>
@@ -329,7 +329,7 @@ class EmailService {
                 ` : ''}
                 <tr style="background-color: #dcfce7; border-top: 2px solid #22c55e;">
                   <td style="padding: 15px 12px; color: #166534; font-weight: bold; font-size: 18px;">💰 Estimated Price:</td>
-                  <td style="padding: 15px 12px; color: #166534; font-weight: bold; font-size: 18px; text-align: right;">$${calculatedPrice.toFixed(2)}</td>
+                  <td style="padding: 15px 12px; color: #166534; font-weight: bold; font-size: 18px; text-align: right;">$${calculatedPrice.toFixed(2)} <span style="font-size: 12px; font-weight: 600; color: #64748b;">+ taxes</span></td>
                 </tr>
               </table>
               <div style="margin-top: 15px; padding: 12px; background-color: #fef3c7; border-radius: 8px; border-left: 4px solid #f59e0b;">
